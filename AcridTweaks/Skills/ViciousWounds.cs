@@ -1,4 +1,5 @@
 ﻿using HACT;
+using R2API;
 using RoR2.Skills;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
@@ -44,6 +45,7 @@ namespace HIFUAcridTweaks.Skills
             {
                 v.canceledFromSprinting = false;
             }
+            LanguageAPI.Add("CROCO_SECONDARY_ALT_DESCRIPTION", "<style=cIsHealing>Poisonous</style>. <style=cIsDamage>Slayer</style>. <style=cIsHealing>Regenerative</style>. Bite an enemy for <style=cIsDamage>320% damage</style>.");
         }
     }
 }

@@ -27,7 +27,7 @@ namespace HACT
 
         public const string PluginAuthor = "HIFU";
         public const string PluginName = "HIFUAcridTweaks";
-        public const string PluginVersion = "1.0.3";
+        public const string PluginVersion = "1.0.5";
 
         public static ConfigFile HACTConfig;
         public static ManualLogSource HACTLogger;
@@ -38,15 +38,17 @@ namespace HACT
         public static ConfigEntry<float> newrotoxinRange;
         public static ConfigEntry<float> newrotoxinRadius;
         public static ConfigEntry<float> newrotoxinProcCoeff;
+        public static ConfigEntry<bool> enableNewrotoxin;
 
         public void Awake()
         {
             HACTLogger = Logger;
             HACTConfig = Config;
 
-            newrotoxinDamage = Config.Bind("Secondary : Neurotoxin", "Damage", 2.6f, "Decimal. Default is 2.6");
-            newrotoxinRange = Config.Bind("Secondary : Neurotoxin", "Range", 25f, "Default is 25");
-            newrotoxinRadius = Config.Bind("Secondary : Neurotoxin", "Radius", 6f, "Default is 6");
+            enableNewrotoxin = Config.Bind("Secondary : Neurotoxin", "Enable Rework?", true, "Vanilla is false");
+            newrotoxinDamage = Config.Bind("Secondary : Neurotoxin", "Damage", 3.2f, "Decimal. Default is 3.2");
+            newrotoxinRange = Config.Bind("Secondary : Neurotoxin", "Range", 45f, "Default is 45");
+            newrotoxinRadius = Config.Bind("Secondary : Neurotoxin", "Radius", 7f, "Default is 7");
             newrotoxinProcCoeff = Config.Bind("Secondary : Neurotoxin", "Proc Coefficient", 1f, "Default is 1");
 
             var acrid = Addressables.LoadAssetAsync<GameObject>("RoR2/Base/Croco/CrocoBody.prefab").WaitForCompletion();
@@ -68,7 +70,7 @@ namespace HACT
 
             NewrotoxinVFX.Create();
             NewrotoxinSD.Create();
-            ReplaceSkill.Create();
+            if (enableNewrotoxin.Value) ReplaceSkill.Create();
 
             IEnumerable<Type> enumerable = from type in Assembly.GetExecutingAssembly().GetTypes()
                                            where !type.IsAbstract && type.IsSubclassOf(typeof(TweakBase))
