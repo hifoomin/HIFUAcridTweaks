@@ -27,7 +27,7 @@ namespace HACT
 
         public const string PluginAuthor = "HIFU";
         public const string PluginName = "HIFUAcridTweaks";
-        public const string PluginVersion = "1.0.5";
+        public const string PluginVersion = "1.0.6";
 
         public static ConfigFile HACTConfig;
         public static ManualLogSource HACTLogger;
@@ -67,6 +67,12 @@ namespace HACT
             esm2.customName = "Neurotoxin";
             esm2.initialStateType = new(typeof(EntityStates.Idle));
             esm2.mainStateType = new(typeof(EntityStates.Idle));
+
+            var nsm = acrid.GetComponent<NetworkStateMachine>();
+
+            Array.Resize(ref nsm.stateMachines, nsm.stateMachines.Length + 2);
+            nsm.stateMachines[nsm.stateMachines.Length - 2] = esm;
+            nsm.stateMachines[nsm.stateMachines.Length - 1] = esm2;
 
             NewrotoxinVFX.Create();
             NewrotoxinSD.Create();
