@@ -1,9 +1,4 @@
-﻿using HACT;
-using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace HIFUAcridTweaks.Misc
+﻿namespace HIFUAcridTweaks.Misc
 {
     internal class Spawn : MiscBase
     {

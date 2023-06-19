@@ -1,6 +1,6 @@
 ﻿using R2API;
 
-namespace HACT
+namespace HIFUAcridTweaks
 {
     public abstract class TweakBase
     {

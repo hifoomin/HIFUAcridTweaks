@@ -1,5 +1,7 @@
-﻿using HACT;
+﻿using R2API;
+using RoR2;
 using RoR2.Skills;
+using UnityEngine;
 using UnityEngine.AddressableAssets;
 
 namespace HIFUAcridTweaks.Skills
@@ -9,17 +11,19 @@ namespace HIFUAcridTweaks.Skills
         public static float damage;
         public static float cdr;
         public static float cooldown;
+        public static float radius;
         public override string Name => "Utility :: Frenzied Leap";
 
         public override string SkillToken => "utility_alt1";
 
-        public override string DescText => "<style=cIsDamage>Stunning</style>. Leap in the air, dealing <style=cIsDamage>" + d(damage) + " damage</style>. <style=cIsUtility>Reduce</style> the cooldown by <style=cIsUtility>" + cdr + "s</style> for every enemy hit.";
+        public override string DescText => "<style=cArtifact>Blighted</style>. <style=cIsDamage>Stunning</style>. Leap in the air, dealing <style=cIsDamage>" + d(damage) + " damage</style> in a small area.";
 
         public override void Init()
         {
-            damage = ConfigOption(5f, "Damage", "Decimal. Vanilla is 5.5");
-            cooldown = ConfigOption(8f, "Cooldown", "Vanilla is 10");
-            cdr = ConfigOption(1.5f, "Cooldown Reduction Per Hit", "Vanilla is 2");
+            damage = ConfigOption(6.5f, "Damage", "Decimal. Vanilla is 5.5");
+            cooldown = ConfigOption(7f, "Cooldown", "Vanilla is 10");
+            radius = ConfigOption(6f, "Area of Effect", "Vanilla is 10");
+
             base.Init();
         }
 
@@ -27,8 +31,39 @@ namespace HIFUAcridTweaks.Skills
         {
             On.EntityStates.Croco.BaseLeap.OnEnter += BaseLeap_OnEnter;
             On.EntityStates.Croco.BaseLeap.OnExit += BaseLeap_OnExit;
+            On.EntityStates.Croco.BaseLeap.DetonateAuthority += BaseLeap_DetonateAuthority;
             On.EntityStates.Croco.ChainableLeap.DoImpactAuthority += ChainableLeap_DoImpactAuthority;
             Changes();
+        }
+
+        private BlastAttack.Result BaseLeap_DetonateAuthority(On.EntityStates.Croco.BaseLeap.orig_DetonateAuthority orig, EntityStates.Croco.BaseLeap self)
+        {
+            Vector3 footPosition = self.characterBody.footPosition;
+            EffectManager.SpawnEffect(self.blastEffectPrefab, new EffectData
+            {
+                origin = footPosition,
+                scale = radius
+            }, true);
+            var ba = new BlastAttack
+            {
+                attacker = self.gameObject,
+                baseDamage = self.damageStat * self.blastDamageCoefficient,
+                baseForce = self.blastForce,
+                bonusForce = self.blastBonusForce,
+                crit = self.isCritAuthority,
+                falloffModel = BlastAttack.FalloffModel.None,
+                procCoefficient = EntityStates.Croco.BaseLeap.blastProcCoefficient,
+                radius = radius,
+                damageType = DamageType.Stun1s,
+                position = footPosition,
+                attackerFiltering = AttackerFiltering.NeverHitSelf,
+                impactEffect = EffectCatalog.FindEffectIndexFromPrefab(self.blastImpactEffectPrefab),
+                teamIndex = self.teamComponent.teamIndex
+            };
+
+            ba.AddModdedDamageType(Main.blight);
+
+            return ba.Fire();
         }
 
         private void BaseLeap_OnExit(On.EntityStates.Croco.BaseLeap.orig_OnExit orig, EntityStates.Croco.BaseLeap self)
@@ -39,7 +74,7 @@ namespace HIFUAcridTweaks.Skills
 
         private void ChainableLeap_DoImpactAuthority(On.EntityStates.Croco.ChainableLeap.orig_DoImpactAuthority orig, EntityStates.Croco.ChainableLeap self)
         {
-            EntityStates.Croco.ChainableLeap.refundPerHit = cdr;
+            EntityStates.Croco.ChainableLeap.refundPerHit = 0f;
             orig(self);
         }
 
@@ -56,6 +91,8 @@ namespace HIFUAcridTweaks.Skills
         {
             var fleap = Addressables.LoadAssetAsync<SkillDef>("RoR2/Base/Croco/CrocoChainableLeap.asset").WaitForCompletion();
             fleap.baseRechargeInterval = cooldown;
+
+            fleap.keywordTokens = new string[] { "HAT_BLIGHT", "KEYWORD_STUNNING" };
         }
     }
 }

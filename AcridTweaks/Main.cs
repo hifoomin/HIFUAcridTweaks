@@ -1,25 +1,24 @@
 using BepInEx;
 using BepInEx.Configuration;
 using BepInEx.Logging;
-using HIFUAcridTweaks;
-using HIFUAcridTweaks.Skilldefs;
 using R2API;
 using R2API.ContentManagement;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using HIFUAcridTweaks.VFX;
 using UnityEngine.AddressableAssets;
 using UnityEngine;
 using RoR2;
 using RoR2.Skills;
 
-namespace HACT
+namespace HIFUAcridTweaks
 {
     [BepInDependency(LanguageAPI.PluginGUID)]
     [BepInDependency(R2APIContentManager.PluginGUID)]
     [BepInDependency(PrefabAPI.PluginGUID)]
+    [BepInDependency(DamageAPI.PluginGUID)]
+    [BepInDependency(DotAPI.PluginGUID)]
     [BepInPlugin(PluginGUID, PluginName, PluginVersion)]
     public class Main : BaseUnityPlugin
     {
@@ -27,29 +26,18 @@ namespace HACT
 
         public const string PluginAuthor = "HIFU";
         public const string PluginName = "HIFUAcridTweaks";
-        public const string PluginVersion = "1.0.6";
+        public const string PluginVersion = "1.2.0";
 
         public static ConfigFile HACTConfig;
         public static ManualLogSource HACTLogger;
 
-        private string version = PluginVersion;
-
-        public static ConfigEntry<float> newrotoxinDamage;
-        public static ConfigEntry<float> newrotoxinRange;
-        public static ConfigEntry<float> newrotoxinRadius;
-        public static ConfigEntry<float> newrotoxinProcCoeff;
-        public static ConfigEntry<bool> enableNewrotoxin;
+        public static DamageAPI.ModdedDamageType poison = DamageAPI.ReserveDamageType();
+        public static DamageAPI.ModdedDamageType blight = DamageAPI.ReserveDamageType();
 
         public void Awake()
         {
             HACTLogger = Logger;
             HACTConfig = Config;
-
-            enableNewrotoxin = Config.Bind("Secondary : Neurotoxin", "Enable Rework?", true, "Vanilla is false");
-            newrotoxinDamage = Config.Bind("Secondary : Neurotoxin", "Damage", 3.2f, "Decimal. Default is 3.2");
-            newrotoxinRange = Config.Bind("Secondary : Neurotoxin", "Range", 45f, "Default is 45");
-            newrotoxinRadius = Config.Bind("Secondary : Neurotoxin", "Radius", 7f, "Default is 7");
-            newrotoxinProcCoeff = Config.Bind("Secondary : Neurotoxin", "Proc Coefficient", 1f, "Default is 1");
 
             var acrid = Addressables.LoadAssetAsync<GameObject>("RoR2/Base/Croco/CrocoBody.prefab").WaitForCompletion();
             var esm = acrid.AddComponent<EntityStateMachine>();
@@ -73,10 +61,6 @@ namespace HACT
             Array.Resize(ref nsm.stateMachines, nsm.stateMachines.Length + 2);
             nsm.stateMachines[nsm.stateMachines.Length - 2] = esm;
             nsm.stateMachines[nsm.stateMachines.Length - 1] = esm2;
-
-            NewrotoxinVFX.Create();
-            NewrotoxinSD.Create();
-            if (enableNewrotoxin.Value) ReplaceSkill.Create();
 
             IEnumerable<Type> enumerable = from type in Assembly.GetExecutingAssembly().GetTypes()
                                            where !type.IsAbstract && type.IsSubclassOf(typeof(TweakBase))
@@ -107,6 +91,15 @@ namespace HACT
                     based.Init();
                 }
             }
+
+            var passiveFamily = Addressables.LoadAssetAsync<SkillFamily>("RoR2/Base/Croco/CrocoBodyPassiveFamily.asset").WaitForCompletion();
+
+            GenericSkill passive = (from x in acrid.GetComponents<GenericSkill>()
+                                    where x.skillFamily == passiveFamily
+                                    select x).First();
+            Destroy(passive);
+
+            Keywords.Keywords.Init();
         }
 
         public bool ValidateTweak(TweakBase tb)

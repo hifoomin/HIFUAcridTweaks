@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace HACT
+namespace HIFUAcridTweaks
 {
     public abstract class TweakBase<T> : TweakBase where T : TweakBase<T>
     {
