@@ -109,8 +109,8 @@ namespace HIFUAcridTweaks.Misc
             ContentAddition.AddBuffDef(frenzied);
 
             regenHeal = ConfigOption(0.05f, "Regenerative Heal Percent", "Decimal. Vanilla is 0.05");
-            regenDur = ConfigOption(0.066f, "Regenerative Buff Duration", "Vanilla is 0.5");
-            frenSpeed = ConfigOption(0.1f, "Frenzied Movement Speed", "Decimal.");
+            regenDur = ConfigOption(0.66f, "Regenerative Buff Duration", "Vanilla is 0.5");
+            frenSpeed = ConfigOption(0.15f, "Frenzied Movement Speed", "Decimal.");
             frenDur = ConfigOption(1f, "Frenzied Buff Duration", "");
             base.Init();
         }

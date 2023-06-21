@@ -67,7 +67,7 @@ namespace HIFUAcridTweaks.Skills
             {
                 switch (passiveController.currentPassive)
                 {
-                    case "KEYWORD_RAPID_SPEED":
+                    case "HAT_FRENZY_NAME":
                         ba.AddModdedDamageType(Passives.frenzy);
                         break;
 

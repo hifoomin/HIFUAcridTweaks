@@ -40,7 +40,7 @@ namespace HIFUAcridTweaks.Skills
                 {
                     switch (passiveController.currentPassive)
                     {
-                        case "KEYWORD_RAPID_SPEED":
+                        case "HAT_FRENZY_NAME":
                             overlapAttack.AddModdedDamageType(Passives.frenzy);
                             break;
 
