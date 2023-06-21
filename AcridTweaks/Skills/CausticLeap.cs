@@ -1,6 +1,7 @@
 ﻿using Mono.Cecil.Cil;
 using MonoMod.Cil;
 using RoR2.Skills;
+using UnityEngine;
 using UnityEngine.AddressableAssets;
 
 namespace HIFUAcridTweaks.Skills
@@ -52,10 +53,10 @@ namespace HIFUAcridTweaks.Skills
             if (self is not EntityStates.Croco.ChainableLeap)
             {
                 self.blastDamageCoefficient = damage;
+                self.blastForce = 0f;
+                self.blastBonusForce = Vector3.zero;
             }
-            if (self is EntityStates.Croco.ChainableLeap)
-            {
-            }
+
             orig(self);
         }
 

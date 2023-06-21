@@ -39,45 +39,52 @@ namespace HIFUAcridTweaks.Skills
 
         private BlastAttack.Result BaseLeap_DetonateAuthority(On.EntityStates.Croco.BaseLeap.orig_DetonateAuthority orig, EntityStates.Croco.BaseLeap self)
         {
-            Vector3 footPosition = self.characterBody.footPosition;
-            EffectManager.SpawnEffect(self.blastEffectPrefab, new EffectData
+            if (self is EntityStates.Croco.ChainableLeap)
             {
-                origin = footPosition,
-                scale = radius
-            }, true);
-            var ba = new BlastAttack
-            {
-                attacker = self.gameObject,
-                baseDamage = self.damageStat * self.blastDamageCoefficient,
-                baseForce = self.blastForce,
-                bonusForce = self.blastBonusForce,
-                crit = self.isCritAuthority,
-                falloffModel = BlastAttack.FalloffModel.None,
-                procCoefficient = EntityStates.Croco.BaseLeap.blastProcCoefficient,
-                radius = radius,
-                damageType = DamageType.Stun1s,
-                position = footPosition,
-                attackerFiltering = AttackerFiltering.NeverHitSelf,
-                impactEffect = EffectCatalog.FindEffectIndexFromPrefab(self.blastImpactEffectPrefab),
-                teamIndex = self.teamComponent.teamIndex
-            };
-
-            var passiveController = self.GetComponent<PassiveController>();
-            if (passiveController != null)
-            {
-                switch (passiveController.currentPassive)
+                Vector3 footPosition = self.characterBody.footPosition;
+                EffectManager.SpawnEffect(self.blastEffectPrefab, new EffectData
                 {
-                    case "HAT_FRENZY_NAME":
-                        ba.AddModdedDamageType(Passives.frenzy);
-                        break;
+                    origin = footPosition,
+                    scale = radius
+                }, true);
+                var ba = new BlastAttack
+                {
+                    attacker = self.gameObject,
+                    baseDamage = self.damageStat * self.blastDamageCoefficient,
+                    baseForce = 0f,
+                    bonusForce = Vector3.zero,
+                    crit = self.isCritAuthority,
+                    falloffModel = BlastAttack.FalloffModel.None,
+                    procCoefficient = EntityStates.Croco.BaseLeap.blastProcCoefficient,
+                    radius = radius,
+                    damageType = DamageType.Stun1s,
+                    position = footPosition,
+                    attackerFiltering = AttackerFiltering.NeverHitSelf,
+                    impactEffect = EffectCatalog.FindEffectIndexFromPrefab(self.blastImpactEffectPrefab),
+                    teamIndex = self.teamComponent.teamIndex
+                };
 
-                    default:
-                        ba.AddModdedDamageType(Passives.regen);
-                        break;
+                var passiveController = self.GetComponent<PassiveController>();
+                if (passiveController != null)
+                {
+                    switch (passiveController.currentPassive)
+                    {
+                        case "HAT_FRENZY_NAME":
+                            ba.AddModdedDamageType(Passives.frenzy);
+                            break;
+
+                        default:
+                            ba.AddModdedDamageType(Passives.regen);
+                            break;
+                    }
                 }
-            }
 
-            return ba.Fire();
+                return ba.Fire();
+            }
+            else
+            {
+                return orig(self);
+            }
         }
 
         private void BaseLeap_OnExit(On.EntityStates.Croco.BaseLeap.orig_OnExit orig, EntityStates.Croco.BaseLeap self)

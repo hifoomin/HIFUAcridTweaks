@@ -14,7 +14,7 @@ namespace HIFUAcridTweaks.Misc
 {
     internal class Passives : MiscBase
     {
-        public override string Name => "Misc :::: Regenerative";
+        public override string Name => "Misc :::: Passives";
 
         public static float regenHeal;
         public static float regenDur;
@@ -109,8 +109,8 @@ namespace HIFUAcridTweaks.Misc
             ContentAddition.AddBuffDef(frenzied);
 
             regenHeal = ConfigOption(0.05f, "Regenerative Heal Percent", "Decimal. Vanilla is 0.05");
-            regenDur = ConfigOption(0.66f, "Regenerative Buff Duration", "Vanilla is 0.5");
-            frenSpeed = ConfigOption(0.15f, "Frenzied Movement Speed", "Decimal.");
+            regenDur = ConfigOption(0.75f, "Regenerative Buff Duration", "Vanilla is 0.5");
+            frenSpeed = ConfigOption(0.4f, "Frenzied Movement Speed", "Decimal.");
             frenDur = ConfigOption(1f, "Frenzied Buff Duration", "");
             base.Init();
         }
@@ -121,8 +121,6 @@ namespace HIFUAcridTweaks.Misc
             CharacterBody.onBodyStartGlobal += CharacterBody_onBodyStartGlobal;
             On.EntityStates.Croco.Slash.OnMeleeHitAuthority += Slash_OnMeleeHitAuthority1;
             On.EntityStates.Croco.Bite.OnMeleeHitAuthority += Bite_OnMeleeHitAuthority1;
-            // IL.EntityStates.Croco.Bite.OnMeleeHitAuthority += Bite_OnMeleeHitAuthority;
-            // IL.EntityStates.Croco.Slash.OnMeleeHitAuthority += Slash_OnMeleeHitAuthority;
             IL.RoR2.CharacterBody.RecalculateStats += CharacterBody_RecalculateStats;
             RecalculateStatsAPI.GetStatCoefficients += RecalculateStatsAPI_GetStatCoefficients;
             GlobalEventManager.onServerDamageDealt += GlobalEventManager_onServerDamageDealt;
@@ -172,8 +170,7 @@ namespace HIFUAcridTweaks.Misc
                 regenAccumulator += healTotal / totalTicks
 
                 */
-                self.regenAccumulator += (self.fullCombinedHealth * regenHeal) / (regenDur / Time.fixedDeltaTime) * self.body.GetBuffCount(regenerative) * Time.fixedDeltaTime; // no healing
-                self.regenAccumulator += (self.fullCombinedHealth * regenHeal) / (regenDur / Time.fixedDeltaTime) * self.body.GetBuffCount(regenerative); // proper amount but instant
+                self.regenAccumulator += (self.fullCombinedHealth * regenHeal) / (regenDur / Time.fixedDeltaTime) * self.body.GetBuffCount(regenerative);
             }
             orig(self);
         }
@@ -224,36 +221,6 @@ namespace HIFUAcridTweaks.Misc
             else
             {
                 Main.HACTLogger.LogError("Failed to apply Regenerative Healing hook");
-            }
-        }
-
-        private void Slash_OnMeleeHitAuthority(ILContext il)
-        {
-            ILCursor c = new(il);
-
-            if (c.TryGotoNext(MoveType.Before,
-                x => x.MatchLdcR4(0.5f)))
-            {
-                c.Next.Operand = 0f;
-            }
-            else
-            {
-                Main.HACTLogger.LogError("Failed to apply Slash Regenerative Duration hook");
-            }
-        }
-
-        private void Bite_OnMeleeHitAuthority(ILContext il)
-        {
-            ILCursor c = new(il);
-
-            if (c.TryGotoNext(MoveType.Before,
-                x => x.MatchLdcR4(0.5f)))
-            {
-                c.Next.Operand = 0f;
-            }
-            else
-            {
-                Main.HACTLogger.LogError("Failed to apply Bite Regenerative Duration hook");
             }
         }
 
