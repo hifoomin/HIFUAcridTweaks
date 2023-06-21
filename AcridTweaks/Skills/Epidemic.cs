@@ -20,12 +20,13 @@ namespace HIFUAcridTweaks.Skills
         public static float shareDuration;
         public static DamageAPI.ModdedDamageType shared = DamageAPI.ReserveDamageType();
         public static BuffDef shareDamage;
+        public static float sharedPercent;
         public static ProcType sharedMask = (ProcType)12561269;
         public override string Name => "Special : Epidemic";
 
         public override string SkillToken => "special";
 
-        public override string DescText => "<style=cArtifact>Blighted</style>. Release a deadly disease that deals <style=cIsDamage>" + d(damage) + " damage</style> and spreads up to <style=cIsDamage>" + maxTargets + "</style> times. All enemies hit <style=cIsDamage>share damage taken</style> for <style=cIsDamage>" + shareDuration + "s</style>.";
+        public override string DescText => "<style=cArtifact>Blighted</style>. Release a deadly disease that deals <style=cIsDamage>" + d(damage) + " damage</style> and spreads up to <style=cIsDamage>" + maxTargets + "</style> times. All enemies hit <style=cIsDamage>share " + d(sharedPercent) + " TOTAL damage taken</style> for <style=cIsDamage>" + shareDuration + "s</style>.";
 
         public override void Init()
         {
@@ -39,11 +40,12 @@ namespace HIFUAcridTweaks.Skills
 
             ContentAddition.AddBuffDef(shareDamage);
 
-            damage = ConfigOption(1.5f, "Damage", "Decimal. Vanilla is 1");
+            damage = ConfigOption(2.5f, "Damage", "Decimal. Vanilla is 1");
             cooldown = ConfigOption(10f, "Cooldown", "Vanilla is 10");
             maxTargets = ConfigOption(4, "Max Targets", "Vanilla is 41");
             maxDistance = ConfigOption(45f, "Max Range", "Vanilla is 30");
             shareDuration = ConfigOption(5f, "Damage Sharing Duration", "");
+            sharedPercent = ConfigOption(0.5f, "Damage Sharing Percent", "Decimal.");
             base.Init();
         }
 
@@ -86,11 +88,11 @@ namespace HIFUAcridTweaks.Skills
                         {
                             LightningOrb orb = new()
                             {
-                                lightningType = LightningOrb.LightningType.CrocoDisease,
+                                lightningType = LightningOrb.LightningType.BFG,
                                 canBounceOnSameTarget = false,
-                                bouncesRemaining = maxTargets - 1,
+                                bouncesRemaining = 1,
                                 damageColorIndex = DamageColorIndex.Poison,
-                                damageValue = info.damage,
+                                damageValue = info.damage * sharedPercent,
                                 damageCoefficientPerBounce = 1f,
                                 attacker = info.attacker,
                                 isCrit = info.crit,
@@ -99,7 +101,9 @@ namespace HIFUAcridTweaks.Skills
                                 targetsToFindPerBounce = 1,
                                 speed = 20000f,
                                 origin = info.position,
-                                procCoefficient = 0f
+                                procCoefficient = 0f,
+                                bouncedObjects = new System.Collections.Generic.List<HealthComponent>(),
+                                duration = 0.2f
                             };
 
                             ProcChainMask mask = new();

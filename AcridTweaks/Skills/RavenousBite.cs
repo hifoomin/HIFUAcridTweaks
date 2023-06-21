@@ -18,7 +18,7 @@ namespace HIFUAcridTweaks.Skills
 
         public override void Init()
         {
-            damage = ConfigOption(3.5f, "Damage", "Decimal. Vanilla is 3.2");
+            damage = ConfigOption(4.5f, "Damage", "Decimal. Vanilla is 3.2");
             cooldown = ConfigOption(3f, "Cooldown", "Vanilla is 2");
             base.Init();
         }

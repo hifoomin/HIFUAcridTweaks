@@ -21,7 +21,7 @@ namespace HIFUAcridTweaks.Skills
 
         public override void Init()
         {
-            damage = ConfigOption(6f, "Damage", "Decimal. Vanilla is 5.5");
+            damage = ConfigOption(6.5f, "Damage", "Decimal. Vanilla is 5.5");
             cooldown = ConfigOption(6f, "Cooldown", "Vanilla is 10");
             radius = ConfigOption(6.5f, "Area of Effect", "Vanilla is 10");
 
@@ -39,31 +39,31 @@ namespace HIFUAcridTweaks.Skills
 
         private BlastAttack.Result BaseLeap_DetonateAuthority(On.EntityStates.Croco.BaseLeap.orig_DetonateAuthority orig, EntityStates.Croco.BaseLeap self)
         {
+            Vector3 footPosition = self.characterBody.footPosition;
+            EffectManager.SpawnEffect(self.blastEffectPrefab, new EffectData
+            {
+                origin = footPosition,
+                scale = radius
+            }, true);
+            var ba = new BlastAttack
+            {
+                attacker = self.gameObject,
+                baseDamage = self.damageStat * self.blastDamageCoefficient,
+                baseForce = 0f,
+                bonusForce = Vector3.zero,
+                crit = self.isCritAuthority,
+                falloffModel = BlastAttack.FalloffModel.None,
+                procCoefficient = EntityStates.Croco.BaseLeap.blastProcCoefficient,
+                radius = radius,
+                damageType = DamageType.Stun1s,
+                position = footPosition,
+                attackerFiltering = AttackerFiltering.NeverHitSelf,
+                impactEffect = EffectCatalog.FindEffectIndexFromPrefab(self.blastImpactEffectPrefab),
+                teamIndex = self.teamComponent.teamIndex
+            };
+
             if (self is EntityStates.Croco.ChainableLeap)
             {
-                Vector3 footPosition = self.characterBody.footPosition;
-                EffectManager.SpawnEffect(self.blastEffectPrefab, new EffectData
-                {
-                    origin = footPosition,
-                    scale = radius
-                }, true);
-                var ba = new BlastAttack
-                {
-                    attacker = self.gameObject,
-                    baseDamage = self.damageStat * self.blastDamageCoefficient,
-                    baseForce = 0f,
-                    bonusForce = Vector3.zero,
-                    crit = self.isCritAuthority,
-                    falloffModel = BlastAttack.FalloffModel.None,
-                    procCoefficient = EntityStates.Croco.BaseLeap.blastProcCoefficient,
-                    radius = radius,
-                    damageType = DamageType.Stun1s,
-                    position = footPosition,
-                    attackerFiltering = AttackerFiltering.NeverHitSelf,
-                    impactEffect = EffectCatalog.FindEffectIndexFromPrefab(self.blastImpactEffectPrefab),
-                    teamIndex = self.teamComponent.teamIndex
-                };
-
                 var passiveController = self.GetComponent<PassiveController>();
                 if (passiveController != null)
                 {
@@ -78,13 +78,13 @@ namespace HIFUAcridTweaks.Skills
                             break;
                     }
                 }
-
-                return ba.Fire();
             }
             else
             {
-                return orig(self);
+                ba.AddModdedDamageType(Main.blight);
             }
+
+            return ba.Fire();
         }
 
         private void BaseLeap_OnExit(On.EntityStates.Croco.BaseLeap.orig_OnExit orig, EntityStates.Croco.BaseLeap self)
