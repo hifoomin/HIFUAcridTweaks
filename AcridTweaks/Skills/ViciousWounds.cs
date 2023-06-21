@@ -1,5 +1,8 @@
-﻿using R2API;
+﻿using HIFUAcridTweaks.Misc;
+using R2API;
+using RoR2;
 using RoR2.Skills;
+using System.Linq;
 using UnityEngine.AddressableAssets;
 
 namespace HIFUAcridTweaks.Skills
@@ -32,6 +35,20 @@ namespace HIFUAcridTweaks.Skills
         {
             if (self.isComboFinisher)
             {
+                var passiveController = self.GetComponent<PassiveController>();
+                if (passiveController != null)
+                {
+                    switch (passiveController.currentPassive)
+                    {
+                        case "KEYWORD_RAPID_SPEED":
+                            overlapAttack.AddModdedDamageType(Passives.frenzy);
+                            break;
+
+                        default:
+                            overlapAttack.AddModdedDamageType(Passives.regen);
+                            break;
+                    }
+                }
                 overlapAttack.AddModdedDamageType(Main.poison);
             }
             orig(self, overlapAttack);

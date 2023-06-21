@@ -48,7 +48,7 @@ namespace HIFUAcridTweaks.Skills
             CustomDotBehaviour behavior = delegate (DotController self, DotStack dotStack)
             {
                 var attackerBody = dotStack.attackerObject?.GetComponent<CharacterBody>();
-                dotStack.damage = attackerBody.damage * damagePerSecond * 0.2f; // 50% per tick, for 250% dps
+                dotStack.damage = attackerBody.damage * damagePerSecond * 0.2f; // 26% per tick, for 130% dps
             };
             blightIndex = RegisterDotDef(blightDef, behavior);
 

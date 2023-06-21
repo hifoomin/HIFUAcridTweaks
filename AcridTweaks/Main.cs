@@ -19,6 +19,7 @@ namespace HIFUAcridTweaks
     [BepInDependency(PrefabAPI.PluginGUID)]
     [BepInDependency(DamageAPI.PluginGUID)]
     [BepInDependency(DotAPI.PluginGUID)]
+    [BepInDependency(RecalculateStatsAPI.PluginGUID)]
     [BepInPlugin(PluginGUID, PluginName, PluginVersion)]
     public class Main : BaseUnityPlugin
     {
@@ -91,13 +92,6 @@ namespace HIFUAcridTweaks
                     based.Init();
                 }
             }
-
-            var passiveFamily = Addressables.LoadAssetAsync<SkillFamily>("RoR2/Base/Croco/CrocoBodyPassiveFamily.asset").WaitForCompletion();
-
-            GenericSkill passive = (from x in acrid.GetComponents<GenericSkill>()
-                                    where x.skillFamily == passiveFamily
-                                    select x).First();
-            Destroy(passive);
 
             Keywords.Keywords.Init();
         }

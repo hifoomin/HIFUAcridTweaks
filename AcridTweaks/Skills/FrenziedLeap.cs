@@ -1,4 +1,5 @@
-﻿using R2API;
+﻿using HIFUAcridTweaks.Misc;
+using R2API;
 using RoR2;
 using RoR2.Skills;
 using UnityEngine;
@@ -16,13 +17,13 @@ namespace HIFUAcridTweaks.Skills
 
         public override string SkillToken => "utility_alt1";
 
-        public override string DescText => "<style=cArtifact>Blighted</style>. <style=cIsDamage>Stunning</style>. Leap in the air, dealing <style=cIsDamage>" + d(damage) + " damage</style> in a small area.";
+        public override string DescText => "<style=cIsHealing>Regenerative</style>. <style=cIsDamage>Stunning</style>. Leap in the air, dealing <style=cIsDamage>" + d(damage) + " damage</style> in a small area.";
 
         public override void Init()
         {
-            damage = ConfigOption(6.5f, "Damage", "Decimal. Vanilla is 5.5");
+            damage = ConfigOption(6f, "Damage", "Decimal. Vanilla is 5.5");
             cooldown = ConfigOption(7f, "Cooldown", "Vanilla is 10");
-            radius = ConfigOption(6f, "Area of Effect", "Vanilla is 10");
+            radius = ConfigOption(6.5f, "Area of Effect", "Vanilla is 10");
 
             base.Init();
         }
@@ -61,7 +62,20 @@ namespace HIFUAcridTweaks.Skills
                 teamIndex = self.teamComponent.teamIndex
             };
 
-            ba.AddModdedDamageType(Main.blight);
+            var passiveController = self.GetComponent<PassiveController>();
+            if (passiveController != null)
+            {
+                switch (passiveController.currentPassive)
+                {
+                    case "KEYWORD_RAPID_SPEED":
+                        ba.AddModdedDamageType(Passives.frenzy);
+                        break;
+
+                    default:
+                        ba.AddModdedDamageType(Passives.regen);
+                        break;
+                }
+            }
 
             return ba.Fire();
         }
@@ -92,7 +106,7 @@ namespace HIFUAcridTweaks.Skills
             var fleap = Addressables.LoadAssetAsync<SkillDef>("RoR2/Base/Croco/CrocoChainableLeap.asset").WaitForCompletion();
             fleap.baseRechargeInterval = cooldown;
 
-            fleap.keywordTokens = new string[] { "HAT_BLIGHT", "KEYWORD_STUNNING" };
+            fleap.keywordTokens = new string[] { "KEYWORD_RAPID_REGEN", "KEYWORD_STUNNING" };
         }
     }
 }

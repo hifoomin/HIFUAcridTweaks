@@ -2,6 +2,7 @@
 using R2API;
 using UnityEngine.AddressableAssets;
 using RoR2.Skills;
+using HIFUAcridTweaks.Misc;
 
 namespace HIFUAcridTweaks.Skills
 {
@@ -17,7 +18,7 @@ namespace HIFUAcridTweaks.Skills
 
         public override void Init()
         {
-            damage = ConfigOption(2.7f, "Damage", "Decimal. Vanilla is 3.2");
+            damage = ConfigOption(2.5f, "Damage", "Decimal. Vanilla is 3.2");
             cooldown = ConfigOption(2f, "Cooldown", "Vanilla is 2");
             base.Init();
         }
@@ -30,6 +31,20 @@ namespace HIFUAcridTweaks.Skills
 
         private void Bite_AuthorityModifyOverlapAttack(On.EntityStates.Croco.Bite.orig_AuthorityModifyOverlapAttack orig, EntityStates.Croco.Bite self, OverlapAttack overlapAttack)
         {
+            var passiveController = self.GetComponent<PassiveController>();
+            if (passiveController != null)
+            {
+                switch (passiveController.currentPassive)
+                {
+                    case "KEYWORD_RAPID_SPEED":
+                        overlapAttack.AddModdedDamageType(Passives.frenzy);
+                        break;
+
+                    default:
+                        overlapAttack.AddModdedDamageType(Passives.regen);
+                        break;
+                }
+            }
             overlapAttack.damageType |= DamageType.BonusToLowHealth;
             overlapAttack.AddModdedDamageType(Main.blight);
         }

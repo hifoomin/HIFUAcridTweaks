@@ -52,7 +52,7 @@ namespace HIFUAcridTweaks.Skills
             CustomDotBehaviour behavior = delegate (DotController self, DotStack dotStack)
             {
                 var attackerBody = dotStack.attackerObject?.GetComponent<CharacterBody>();
-                dotStack.damage = Mathf.Min(Mathf.Max(self.victimHealthComponent ? self.victimHealthComponent.fullCombinedHealth * percentDamagePerSecond * 0.25f : 0, attackerBody.damage * getReal * 0.25f), attackerBody.damage * dpsCap * 0.25f); // 0.5% per tick, for 2% max hp per sec
+                dotStack.damage = Mathf.Min(Mathf.Max(self.victimHealthComponent ? self.victimHealthComponent.fullCombinedHealth * percentDamagePerSecond * 0.25f : 0, attackerBody.damage * getReal * 0.25f), attackerBody.damage * dpsCap * 0.25f); // 0.375% per tick, for 1.5% max hp per sec
             };
             poisonIndex = RegisterDotDef(poisonDef, behavior);
 
