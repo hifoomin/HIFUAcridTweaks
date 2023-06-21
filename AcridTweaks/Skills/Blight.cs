@@ -32,6 +32,7 @@ namespace HIFUAcridTweaks.Skills
             blight.isHidden = false;
             blight.iconSprite = Addressables.LoadAssetAsync<BuffDef>("RoR2/Base/Croco/bdBlight.asset").WaitForCompletion().iconSprite;
             blight.buffColor = new Color32(177, 56, 127, 255);
+            blight.name = "Blight";
 
             ContentAddition.AddBuffDef(blight);
 

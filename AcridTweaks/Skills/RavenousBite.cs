@@ -14,19 +14,26 @@ namespace HIFUAcridTweaks.Skills
 
         public override string SkillToken => "secondary_alt";
 
-        public override string DescText => "<style=cArtifact>Blighted</style>. <style=cIsDamage>Slayer</style>. <style=cIsHealing>Regenerative</style>. Bite an enemy for <style=cIsDamage>" + d(damage) + " damage</style>.";
+        public override string DescText => "<style=cIsUtility>Agile</style>. <style=cArtifact>Blighted</style>. <style=cIsHealing>Regenerative</style>. Bite an enemy for <style=cIsDamage>" + d(damage) + " damage</style>.";
 
         public override void Init()
         {
-            damage = ConfigOption(2.5f, "Damage", "Decimal. Vanilla is 3.2");
-            cooldown = ConfigOption(2f, "Cooldown", "Vanilla is 2");
+            damage = ConfigOption(3.5f, "Damage", "Decimal. Vanilla is 3.2");
+            cooldown = ConfigOption(3f, "Cooldown", "Vanilla is 2");
             base.Init();
         }
 
         public override void Hooks()
         {
+            On.EntityStates.Croco.Bite.OnEnter += Bite_OnEnter;
             On.EntityStates.Croco.Bite.AuthorityModifyOverlapAttack += Bite_AuthorityModifyOverlapAttack;
             Changes();
+        }
+
+        private void Bite_OnEnter(On.EntityStates.Croco.Bite.orig_OnEnter orig, EntityStates.Croco.Bite self)
+        {
+            self.damageCoefficient = damage;
+            orig(self);
         }
 
         private void Bite_AuthorityModifyOverlapAttack(On.EntityStates.Croco.Bite.orig_AuthorityModifyOverlapAttack orig, EntityStates.Croco.Bite self, OverlapAttack overlapAttack)
@@ -45,7 +52,6 @@ namespace HIFUAcridTweaks.Skills
                         break;
                 }
             }
-            overlapAttack.damageType |= DamageType.BonusToLowHealth;
             overlapAttack.AddModdedDamageType(Main.blight);
         }
 
@@ -53,8 +59,9 @@ namespace HIFUAcridTweaks.Skills
         {
             var bite = Addressables.LoadAssetAsync<SkillDef>("RoR2/Base/Croco/CrocoBite.asset").WaitForCompletion();
             bite.baseRechargeInterval = cooldown;
+            bite.cancelSprintingOnActivation = false;
 
-            bite.keywordTokens = new string[] { "HAT_BLIGHT", "KEYWORD_SLAYER", "KEYWORD_RAPID_REGEN" };
+            bite.keywordTokens = new string[] { "HAT_BLIGHT", "KEYWORD_AGILE", "KEYWORD_RAPID_REGEN" };
         }
     }
 }

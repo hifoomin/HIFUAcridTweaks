@@ -18,11 +18,11 @@ namespace HIFUAcridTweaks.Skills
 
         public override string SkillToken => "secondary";
 
-        public override string DescText => "<style=cArtifact>Blighted</style>. Spit toxic bile for <style=cIsDamage>" + d(damage) + " damage</style>.";
+        public override string DescText => "<style=cIsUtility>Agile</style>. <style=cArtifact>Blighted</style>. Spit toxic bile for <style=cIsDamage>" + d(damage) + " damage</style>.";
 
         public override void Init()
         {
-            damage = ConfigOption(2.5f, "Damage", "Decimal. Vanilla is 2.4");
+            damage = ConfigOption(2f, "Damage", "Decimal. Vanilla is 2.4");
             cooldown = ConfigOption(3f, "Cooldown", "Vanilla is 2");
             aoe = ConfigOption(8f, "Area of Effect", "Vanilla is 3");
             base.Init();
@@ -39,11 +39,7 @@ namespace HIFUAcridTweaks.Skills
         {
             self.baseDuration = 0.3f;
 
-            if (self is EntityStates.Croco.FireDiseaseProjectile)
-            {
-                self.damageCoefficient = Epidemic.damage;
-            }
-            else
+            if (self is not EntityStates.Croco.FireDiseaseProjectile)
             {
                 self.damageCoefficient = damage;
             }

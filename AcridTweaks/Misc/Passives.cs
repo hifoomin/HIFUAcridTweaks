@@ -96,6 +96,7 @@ namespace HIFUAcridTweaks.Misc
             regenerative.isHidden = false;
             regenerative.buffColor = new Color32(201, 242, 77, 255);
             regenerative.iconSprite = Addressables.LoadAssetAsync<BuffDef>("RoR2/Base/Croco/bdCrocoRegen.asset").WaitForCompletion().iconSprite;
+            regenerative.name = "Regenerative";
 
             frenzied = ScriptableObject.CreateInstance<BuffDef>();
             frenzied.isDebuff = false;
@@ -104,14 +105,15 @@ namespace HIFUAcridTweaks.Misc
             frenzied.isHidden = false;
             frenzied.buffColor = new Color32(201, 242, 77, 255);
             frenzied.iconSprite = Addressables.LoadAssetAsync<BuffDef>("RoR2/DLC1/MoveSpeedOnKill/bdKillMoveSpeed.asset").WaitForCompletion().iconSprite;
+            frenzied.name = "Frenzied";
 
             ContentAddition.AddBuffDef(regenerative);
             ContentAddition.AddBuffDef(frenzied);
 
             regenHeal = ConfigOption(0.05f, "Regenerative Heal Percent", "Decimal. Vanilla is 0.05");
             regenDur = ConfigOption(0.75f, "Regenerative Buff Duration", "Vanilla is 0.5");
-            frenSpeed = ConfigOption(0.4f, "Frenzied Movement Speed", "Decimal.");
-            frenDur = ConfigOption(1f, "Frenzied Buff Duration", "");
+            frenSpeed = ConfigOption(0.15f, "Frenzied Movement Speed", "Decimal.");
+            frenDur = ConfigOption(3f, "Frenzied Buff Duration", "");
             base.Init();
         }
 
@@ -164,7 +166,7 @@ namespace HIFUAcridTweaks.Misc
             {
                 /*
 
-                totalTicks = heal duration (0.66) / Time.fixedDeltaTime
+                totalTicks = heal duration (0.75) / Time.fixedDeltaTime
                 healTotal = full combined health (140) * % heal (0.075)
 
                 regenAccumulator += healTotal / totalTicks
@@ -230,8 +232,8 @@ namespace HIFUAcridTweaks.Misc
             LanguageAPI.Add("HAT_REGEN_DESCRIPTION", "<style=cIsHealing>Regenerative</style> attacks heal over a short duration.");
             LanguageAPI.Add("HAT_FRENZY_NAME", "Frenzied");
             LanguageAPI.Add("HAT_FRENZY_DESCRIPTION", "Attacks that apply <style=cIsHealing>Regenerative</style> apply <style=cIsDamage>Frenzied</style> instead, which increases movement speed for a short duration.");
-            LanguageAPI.Add("KEYWORD_RAPID_REGEN", "<style=cKeywordName>Regenerative</style><style=cSub>Heal for <style=cIsHealing>" + Math.Round(regenHeal * regenDur * 100, 2) + "%</style> of your maximum health over " + Math.Round(regenDur, 2) + "s. <i>Can stack.</i></style>");
-            LanguageAPI.Add("KEYWORD_RAPID_SPEED", "<style=cKeywordName>Frenzied</style><style=cSub>Gain <style=cIsUtility>" + d(frenSpeed) + "</style> movement speed for " + frenDur + "s. <i>Can stack.</i></style>");
+            LanguageAPI.Add("KEYWORD_RAPID_REGEN", "<style=cKeywordName>Regenerative</style><style=cSub>Heal for <style=cIsHealing>" + Math.Round(regenHeal * 100, 2) + "%</style> of your maximum health over " + Math.Round(regenDur, 2) + "s. <i>Can stack.</i></style>");
+            LanguageAPI.Add("KEYWORD_RAPID_SPEED", "<style=cKeywordName>Frenzied</style><style=cSub>Gain <style=cIsUtility>" + Math.Round(frenSpeed * 100, 2) + "%</style> movement speed for " + Math.Round(frenDur, 2) + "s. <i>Can stack.</i></style>");
         }
     }
 }
