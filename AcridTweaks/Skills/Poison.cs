@@ -15,7 +15,7 @@ namespace HIFUAcridTweaks.Skills
         public static float percentDamagePerSecond;
         public static float dpsCap;
         public static float getReal;
-
+        public override bool DoesNotKillTheMod => false;
         public static BuffDef poison;
         public static DotDef poisonDef;
         public static DotIndex poisonIndex;
@@ -70,7 +70,7 @@ namespace HIFUAcridTweaks.Skills
         {
             var damageInfo = report.damageInfo;
 
-            var attacker = report.attacker;
+            var attacker = report.attackerBody;
             if (!attacker)
             {
                 return;
@@ -87,7 +87,7 @@ namespace HIFUAcridTweaks.Skills
                 InflictDotInfo dotInfo = new()
                 {
                     victimObject = victim.gameObject,
-                    attackerObject = attacker,
+                    attackerObject = attacker.gameObject,
                     totalDamage = null,
                     dotIndex = poisonIndex,
                     duration = duration,
@@ -95,6 +95,12 @@ namespace HIFUAcridTweaks.Skills
                     maxStacksFromAttacker = 1
                 };
                 InflictDot(ref dotInfo);
+
+                var master = attacker.master;
+                if (master && master.playerStatsComponent)
+                {
+                    master.playerStatsComponent.currentStats.PushStatValue(RoR2.Stats.StatDef.totalCrocoInfectionsInflicted, 1UL);
+                }
             }
         }
 

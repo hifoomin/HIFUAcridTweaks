@@ -13,6 +13,7 @@ namespace HIFUAcridTweaks.Skills
     {
         public static float duration;
         public static float damagePerSecond;
+        public override bool DoesNotKillTheMod => false;
 
         public static BuffDef blight;
         public static DotDef blightDef;

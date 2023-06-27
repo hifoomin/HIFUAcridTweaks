@@ -10,6 +10,7 @@ namespace HIFUAcridTweaks.Skills
     {
         public static float damage;
         public static float cooldown;
+        public override bool DoesNotKillTheMod => true;
         public override string Name => "Secondary :: Ravenous Bite";
 
         public override string SkillToken => "secondary_alt";

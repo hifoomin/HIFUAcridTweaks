@@ -22,6 +22,7 @@ namespace HIFUAcridTweaks.Skills
         public static BuffDef shareDamage;
         public static float sharedPercent;
         public static ProcType sharedMask = (ProcType)12561269;
+        public override bool DoesNotKillTheMod => true;
         public override string Name => "Special : Epidemic";
 
         public override string SkillToken => "special";
@@ -45,7 +46,7 @@ namespace HIFUAcridTweaks.Skills
             maxTargets = ConfigOption(4, "Max Targets", "Vanilla is 41");
             maxDistance = ConfigOption(45f, "Max Range", "Vanilla is 30");
             shareDuration = ConfigOption(5f, "Damage Sharing Duration", "");
-            sharedPercent = ConfigOption(0.5f, "Damage Sharing Percent", "Decimal.");
+            sharedPercent = ConfigOption(0.25f, "Damage Sharing Percent", "Decimal.");
             base.Init();
         }
 

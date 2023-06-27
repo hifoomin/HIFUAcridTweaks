@@ -3,6 +3,7 @@
     internal class Spawn : MiscBase
     {
         public override string Name => "Misc : Spawn Animation";
+        public override bool DoesNotKillTheMod => true;
 
         public override void Init()
         {

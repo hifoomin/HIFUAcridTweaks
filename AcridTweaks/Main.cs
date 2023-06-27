@@ -98,6 +98,10 @@ namespace HIFUAcridTweaks
 
         public bool ValidateTweak(TweakBase tb)
         {
+            if (!tb.DoesNotKillTheMod)
+            {
+                return true;
+            }
             if (tb.isEnabled)
             {
                 bool enabledfr = Config.Bind(tb.Name, "Enable?", true, "Vanilla is false").Value;
@@ -111,6 +115,10 @@ namespace HIFUAcridTweaks
 
         public bool ValidateMisc(MiscBase mb)
         {
+            if (!mb.DoesNotKillTheMod)
+            {
+                return true;
+            }
             if (mb.isEnabled)
             {
                 bool enabledfr = Config.Bind(mb.Name, "Enable?", true, "Vanilla is false").Value;

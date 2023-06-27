@@ -1,8 +1,6 @@
 ﻿using HIFUAcridTweaks.Misc;
 using R2API;
-using RoR2;
 using RoR2.Skills;
-using System.Linq;
 using UnityEngine.AddressableAssets;
 
 namespace HIFUAcridTweaks.Skills
@@ -13,6 +11,7 @@ namespace HIFUAcridTweaks.Skills
         public float duration;
         public float damage;
         public float lastHitDamage;
+        public override bool DoesNotKillTheMod => true;
         public override string Name => "Primary : Vicious Wounds";
 
         public override string SkillToken => "primary";

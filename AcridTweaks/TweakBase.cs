@@ -8,6 +8,7 @@ namespace HIFUAcridTweaks
         public abstract string SkillToken { get; }
         public abstract string DescText { get; }
         public virtual bool isEnabled { get; } = true;
+        public abstract bool DoesNotKillTheMod { get; }
 
         public T ConfigOption<T>(T value, string name, string description)
         {

@@ -6,16 +6,15 @@ using UnityEngine;
 using UnityEngine.AddressableAssets;
 using static R2API.DamageAPI;
 using RoR2.Skills;
-using UnityEngine.Networking.Types;
-using System.Linq;
 using HIFUAcridTweaks.Skills;
+using RoR2.Achievements;
 
 namespace HIFUAcridTweaks.Misc
 {
     internal class Passives : MiscBase
     {
         public override string Name => "Misc :::: Passives";
-
+        public override bool DoesNotKillTheMod => false;
         public static float regenHeal;
         public static float regenDur;
         public static float frenSpeed;
@@ -27,6 +26,7 @@ namespace HIFUAcridTweaks.Misc
         public static ModdedDamageType regen = ReserveDamageType();
         public static ModdedDamageType frenzy = ReserveDamageType();
         public static BodyIndex acridBodyIndex;
+        public static UnlockableDef frenziedUnlock;
 
         public override void Init()
         {
@@ -86,8 +86,21 @@ namespace HIFUAcridTweaks.Misc
 
             ContentAddition.AddSkillDef(frenziedSD);
 
+            var blightTex = Addressables.LoadAssetAsync<Texture2D>("RoR2/Base/Croco/texCrocoSkillIcons.png").WaitForCompletion();
+
+            frenziedUnlock = ScriptableObject.CreateInstance<UnlockableDef>();
+            frenziedUnlock.nameToken = "ACHIEVEMENT_ACRIDFRENZIED_NAME";
+            frenziedUnlock.cachedName = "Acrid.Skills_Frenzied";
+            frenziedUnlock.achievementIcon = Sprite.Create(blightTex, new Rect(0f, 0f, 128f, 128f), new Vector2(0f, 0f));
+
+            LanguageAPI.Add("ACHIEVEMENT_ACRIDFRENZIED_NAME", "Acrid: Frenzy");
+            LanguageAPI.Add("ACHIEVEMENT_ACRIDFRENZIED_DESCRIPTION", "As Acrid, use 10 skills in under 3 seconds.");
+
+            ContentAddition.AddUnlockableDef(frenziedUnlock);
+
             passiveFamily.variants[0].skillDef = regenerativeSD;
             passiveFamily.variants[1].skillDef = frenziedSD;
+            passiveFamily.variants[1].unlockableDef = frenziedUnlock;
 
             regenerative = ScriptableObject.CreateInstance<BuffDef>();
             regenerative.isDebuff = false;
@@ -111,7 +124,7 @@ namespace HIFUAcridTweaks.Misc
             ContentAddition.AddBuffDef(frenzied);
 
             regenHeal = ConfigOption(0.05f, "Regenerative Heal Percent", "Decimal. Vanilla is 0.05");
-            regenDur = ConfigOption(0.75f, "Regenerative Buff Duration", "Vanilla is 0.5");
+            regenDur = ConfigOption(1f, "Regenerative Buff Duration", "Vanilla is 0.5");
             frenSpeed = ConfigOption(0.15f, "Frenzied Movement Speed", "Decimal.");
             frenDur = ConfigOption(4f, "Frenzied Buff Duration", "");
             base.Init();
@@ -234,6 +247,103 @@ namespace HIFUAcridTweaks.Misc
             LanguageAPI.Add("HAT_FRENZY_DESCRIPTION", "Attacks that apply <style=cIsHealing>Regenerative</style> apply <style=cIsDamage>Frenzied</style> instead, which increases movement speed for a short duration.");
             LanguageAPI.Add("KEYWORD_RAPID_REGEN", "<style=cKeywordName>Regenerative</style><style=cSub>Heal for <style=cIsHealing>" + Math.Round(regenHeal * 100, 2) + "%</style> of your maximum health over " + Math.Round(regenDur, 2) + "s. <i>Can stack.</i></style>");
             LanguageAPI.Add("KEYWORD_RAPID_SPEED", "<style=cKeywordName>Frenzied</style><style=cSub>Gain <style=cIsUtility>" + Math.Round(frenSpeed * 100, 2) + "%</style> movement speed for " + Math.Round(frenDur, 2) + "s. <i>Can stack.</i></style>");
+        }
+    }
+
+    [RegisterAchievement("AcridFrenzied", "Acrid.Skills_Frenzied", "BeatArena", null)]
+    public class FrenziedAchievement : BaseAchievement
+    {
+        private static readonly int requiredSkillCount = 10;
+        private CharacterBody _trackedBody;
+        private DoXInYSecondsTracker tracker;
+        private static readonly float windowSeconds = 3f;
+
+        private CharacterBody trackedBody
+        {
+            get
+            {
+                return _trackedBody;
+            }
+
+            set
+            {
+                if (_trackedBody == value)
+                {
+                    return;
+                }
+
+                if (_trackedBody != null)
+                {
+                    _trackedBody.onSkillActivatedAuthority -= OnSkillActivated;
+                }
+
+                _trackedBody = value;
+
+                if (_trackedBody != null)
+                {
+                    _trackedBody.onSkillActivatedAuthority += OnSkillActivated;
+                }
+            }
+        }
+
+        [SystemInitializer(typeof(HG.Reflection.SearchableAttribute.OptInAttribute))]
+        public override BodyIndex LookUpRequiredBodyIndex()
+        {
+            return BodyCatalog.FindBodyIndex("CrocoBody");
+        }
+
+        [SystemInitializer(typeof(HG.Reflection.SearchableAttribute.OptInAttribute))]
+        public override void OnInstall()
+        {
+            base.OnInstall();
+            tracker = new(requiredSkillCount, windowSeconds);
+        }
+
+        [SystemInitializer(typeof(HG.Reflection.SearchableAttribute.OptInAttribute))]
+        public override void OnUninstall()
+        {
+            tracker = null;
+            base.OnUninstall();
+        }
+
+        [SystemInitializer(typeof(HG.Reflection.SearchableAttribute.OptInAttribute))]
+        public override void OnBodyRequirementMet()
+        {
+            base.OnBodyRequirementMet();
+            trackedBody = localUser.cachedBody;
+            localUser.onBodyChanged += OnBodyChanged;
+            tracker.Clear();
+        }
+
+        [SystemInitializer(typeof(HG.Reflection.SearchableAttribute.OptInAttribute))]
+        public override void OnBodyRequirementBroken()
+        {
+            if (localUser != null)
+            {
+                localUser.onBodyChanged -= OnBodyChanged;
+            }
+            trackedBody = null;
+            base.OnBodyRequirementBroken();
+            if (tracker != null)
+            {
+                tracker.Clear();
+            }
+        }
+
+        [SystemInitializer(typeof(HG.Reflection.SearchableAttribute.OptInAttribute))]
+        private void OnBodyChanged()
+        {
+            trackedBody = localUser.cachedBody;
+            tracker.Clear();
+        }
+
+        [SystemInitializer(typeof(HG.Reflection.SearchableAttribute.OptInAttribute))]
+        private void OnSkillActivated(GenericSkill skill)
+        {
+            if (tracker.Push(Run.FixedTimeStamp.now.t))
+            {
+                Grant();
+            }
         }
     }
 }

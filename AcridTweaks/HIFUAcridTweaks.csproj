@@ -26,6 +26,7 @@
 	<PackageReference Include="R2API.DamageType" Version="1.0.4" />
 	<PackageReference Include="R2API.Dot" Version="1.0.1" />
 	<PackageReference Include="R2API.RecalculateStats" Version="1.2.0" />
+	<PackageReference Include="R2API.Core" Version="5.0.10" />
   </ItemGroup>
 
   <ItemGroup>

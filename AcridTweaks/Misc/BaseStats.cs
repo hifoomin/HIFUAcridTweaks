@@ -7,7 +7,7 @@ namespace HIFUAcridTweaks.Misc
     internal class BaseStats : MiscBase
     {
         public override string Name => "Misc :: Base Stats";
-
+        public override bool DoesNotKillTheMod => true;
         public static float baseDamage;
         public static float baseHealth;
 

@@ -6,7 +6,7 @@ namespace HIFUAcridTweaks.Misc
     internal class HurtBox : MiscBase
     {
         public override string Name => "Misc ::: Hurt Box";
-
+        public override bool DoesNotKillTheMod => true;
         public static float sizeMultiplier;
 
         public override void Init()

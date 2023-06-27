@@ -13,6 +13,7 @@ namespace HIFUAcridTweaks.Skills
         public static float cdr;
         public static float cooldown;
         public static float radius;
+        public override bool DoesNotKillTheMod => true;
         public override string Name => "Utility :: Frenzied Leap";
 
         public override string SkillToken => "utility_alt1";
