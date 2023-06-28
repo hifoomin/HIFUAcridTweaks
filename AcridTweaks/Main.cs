@@ -44,6 +44,9 @@ namespace HIFUAcridTweaks
             HACTLogger = Logger;
             HACTConfig = Config;
 
+            HACTBackupConfig = new(Paths.ConfigPath + "\\" + PluginAuthor + "." + PluginName + ".Backup.cfg", true);
+            HACTBackupConfig.Bind(": DO NOT MODIFY THIS FILES CONTENTS :", ": DO NOT MODIFY THIS FILES CONTENTS :", ": DO NOT MODIFY THIS FILES CONTENTS :", ": DO NOT MODIFY THIS FILES CONTENTS :");
+
             enableAutoConfig = HACTConfig.Bind("Config", "Enable Auto Config Sync", true, "Disabling this would stop HIFUAcridTweaks from syncing config whenever a new version is found.");
             bool _preVersioning = !((Dictionary<ConfigDefinition, string>)AccessTools.DeclaredPropertyGetter(typeof(ConfigFile), "OrphanedEntries").Invoke(HACTConfig, null)).Keys.Any(x => x.Key == "Latest Version");
             latestVersion = HACTConfig.Bind("Config", "Latest Version", PluginVersion, "DO NOT CHANGE THIS");

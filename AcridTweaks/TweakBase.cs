@@ -13,6 +13,7 @@ namespace HIFUAcridTweaks
         public T ConfigOption<T>(T value, string name, string description)
         {
             var config = Main.HACTConfig.Bind<T>(Name, name, value, description);
+            Main.HACTBackupConfig.Bind<T>(Name, name, value, description);
             ConfigManager.HandleConfigAttributes(value.GetType(), name, description, config.Definition.Section, config.DefaultValue, Main.HACTConfig);
             return config.Value;
         }

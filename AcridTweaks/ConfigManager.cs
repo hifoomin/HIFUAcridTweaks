@@ -1,4 +1,5 @@
 ﻿using BepInEx.Configuration;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Linq;
 using System.Reflection;
@@ -21,7 +22,12 @@ namespace HIFUAcridTweaks
             {
                 if (!field.IsStatic) continue;
 
+                // if (field.IsLiteral) continue; //  [Error  : Unity Log] FieldAccessException: Cannot set a constant field 5uhreyFGXVCJ*E$JRDS*OICVJ
+
                 Type t = field.FieldType;
+
+                // if (!Convert.ToBoolean(t)) continue; // [Error  : Unity Log] FormatException: String was not recognized as a valid Boolean. FUCK FKFUCKF U FIF JDGUF JFEDGUJOTTYJREJTGYERYTG
+                // if (!bool.Parse(t.ToString())) continue; // [Error  : Unity Log] InvalidCastException: Specified cast is not valid. AERILFJIFODSJIG
 
                 Debug.LogErrorFormat("data: {0}, {1}, {2}, {3}, {4}, {5}", type, name, description, section, defaultValue, config);
                 Main.HACTLogger.LogError("field is " + field.Name + " type: " + t);
@@ -36,25 +42,22 @@ namespace HIFUAcridTweaks
 
                 ConfigEntryBase val = (ConfigEntryBase)method.Invoke(config, new object[] { new ConfigDefinition(section, name), defaultValue, new ConfigDescription(description) });
                 ConfigEntryBase backupVal = (ConfigEntryBase)method.Invoke(Main.HACTBackupConfig, new object[] { new ConfigDefinition(Regex.Replace(config.ConfigFilePath, "\\W", "") + " : " + section, name), val.DefaultValue, new ConfigDescription(description) });
-                // problems here -- [Error  : Unity Log] TargetException: Non-static method requires a target.
-                Debug.LogErrorFormat("val and backupVal: {0} {1}", val, backupVal);
-                if (val != null && backupVal != null)
-                {
-                    Main.HACTLogger.LogError(section + " : " + name + " " + val.DefaultValue + " / " + val.BoxedValue + " ... " + backupVal.DefaultValue + " / " + backupVal.BoxedValue + " >> " + VersionChanged);
 
-                    if (!ConfigEqual(backupVal.DefaultValue, backupVal.BoxedValue))
+                Debug.LogErrorFormat("val and backupVal: {0} {1}", val, backupVal);
+                Main.HACTLogger.LogError(section + " : " + name + " " + val.DefaultValue + " / " + val.BoxedValue + " ... " + backupVal.DefaultValue + " / " + backupVal.BoxedValue + " >> " + VersionChanged);
+
+                if (!ConfigEqual(backupVal.DefaultValue, backupVal.BoxedValue))
+                {
+                    Main.HACTLogger.LogError("Config Updated: " + section + " : " + name + " from " + val.BoxedValue + " to " + val.DefaultValue);
+                    if (VersionChanged)
                     {
-                        Main.HACTLogger.LogError("Config Updated: " + section + " : " + name + " from " + val.BoxedValue + " to " + val.DefaultValue);
-                        if (VersionChanged)
-                        {
-                            Main.HACTLogger.LogError("Autosyncing...");
-                            val.BoxedValue = val.DefaultValue;
-                            backupVal.BoxedValue = backupVal.DefaultValue;
-                        }
+                        Main.HACTLogger.LogError("Autosyncing...");
+                        val.BoxedValue = val.DefaultValue;
+                        backupVal.BoxedValue = backupVal.DefaultValue;
                     }
-                    if (!ConfigEqual(val.DefaultValue, val.BoxedValue)) ConfigChanged = true;
-                    field.SetValue(null, val.BoxedValue);
                 }
+                if (!ConfigEqual(val.DefaultValue, val.BoxedValue)) ConfigChanged = true;
+                field.SetValue(null, val.BoxedValue);
             }
         }
 
