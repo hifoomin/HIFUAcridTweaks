@@ -1,11 +1,7 @@
 ﻿using BepInEx.Configuration;
-using IL.RoR2.Achievements.Merc;
-using System;
 using System.Linq;
 using System.Reflection;
-using System.Text.RegularExpressions;
 using UnityEngine;
-using static System.Collections.Specialized.BitVector32;
 
 namespace HIFUAcridTweaks
 {
@@ -26,10 +22,6 @@ namespace HIFUAcridTweaks
 
             Debug.LogErrorFormat("entry SettingType: {0} | entry DefaultValue: {1}", entry.SettingType, entry.DefaultValue);
 
-            method.Invoke(config, new object[] { new ConfigDefinition(entry.Definition.Section, name), entry.DefaultValue, new ConfigDescription(entry.Description.Description) });
-
-            // method.Invoke(config, new object[] { new ConfigDefinition(entry.Definition.Section, name), entry.DefaultValue, new ConfigDescription(entry.Description.Description) });
-
             ConfigEntryBase backupVal = (ConfigEntryBase)method.Invoke(config, new object[] { new ConfigDefinition(entry.Definition.Section, name), entry.DefaultValue, new ConfigDescription(entry.Description.Description) });
             /* calls ConfigFile.Bind regardless of type. see new ConfigEntryBase(); */
 
@@ -40,12 +32,13 @@ namespace HIFUAcridTweaks
 
             if (!ConfigEqual(backupVal.DefaultValue, backupVal.BoxedValue)) // see if defaults have changed
             {
-                if (VersionChanged) // sanity check
+                if (VersionChanged)
                 {
-                    entry.BoxedValue = entry.DefaultValue; // Override Current Value to Default of Version 1.0.1
-                    backupVal.BoxedValue = backupVal.DefaultValue; // Update Old Default to New Default
+                    entry.BoxedValue = entry.DefaultValue; // override current value to default of version 1.0.1
+                    backupVal.BoxedValue = backupVal.DefaultValue; // update old default to new default
                 }
             }
+            if (!ConfigEqual(entry.DefaultValue, entry.BoxedValue)) ConfigChanged = true;
         }
 
         private static bool ConfigEqual(object a, object b)
