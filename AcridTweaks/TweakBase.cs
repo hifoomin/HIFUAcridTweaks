@@ -1,4 +1,8 @@
-﻿using R2API;
+﻿using BepInEx.Configuration;
+using R2API;
+using static Mono.Security.X509.X520;
+using static System.Collections.Specialized.BitVector32;
+using System.Text.RegularExpressions;
 
 namespace HIFUAcridTweaks
 {
@@ -12,9 +16,8 @@ namespace HIFUAcridTweaks
 
         public T ConfigOption<T>(T value, string name, string description)
         {
-            var config = Main.HACTConfig.Bind<T>(Name, name, value, description);
-            Main.HACTBackupConfig.Bind<T>(Name, name, value, description);
-            ConfigManager.HandleConfigAttributes(value.GetType(), name, description, config.Definition.Section, config.DefaultValue, Main.HACTConfig);
+            var config = Main.HACTConfig.Bind<T>(Name, name, value, description); // make the config
+            ConfigManager.HandleConfig(config, Main.HACTConfig, Name); // config versioning
             return config.Value;
         }
 
