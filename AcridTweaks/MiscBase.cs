@@ -8,7 +8,9 @@
 
         public T ConfigOption<T>(T value, string name, string description)
         {
-            return Main.HACTConfig.Bind<T>(Name, name, value, description).Value;
+            var config = Main.HACTConfig.Bind<T>(Name, name, value, description);
+            ConfigManager.HandleConfigAttributes(value.GetType(), name, description, config.Definition.Section, config.DefaultValue, Main.HACTConfig);
+            return config.Value;
         }
 
         public abstract void Hooks();

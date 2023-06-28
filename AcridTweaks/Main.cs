@@ -11,6 +11,7 @@ using UnityEngine.AddressableAssets;
 using UnityEngine;
 using RoR2;
 using RoR2.Skills;
+using HarmonyLib;
 
 namespace HIFUAcridTweaks
 {
@@ -30,6 +31,9 @@ namespace HIFUAcridTweaks
         public const string PluginVersion = "1.2.0";
 
         public static ConfigFile HACTConfig;
+        public static ConfigFile HACTBackupConfig;
+        public static ConfigEntry<bool> enableAutoConfig { get; set; }
+        public static ConfigEntry<string> latestVersion { get; set; }
         public static ManualLogSource HACTLogger;
 
         public static DamageAPI.ModdedDamageType poison = DamageAPI.ReserveDamageType();
@@ -39,6 +43,16 @@ namespace HIFUAcridTweaks
         {
             HACTLogger = Logger;
             HACTConfig = Config;
+
+            enableAutoConfig = HACTConfig.Bind("Config", "Enable Auto Config Sync", true, "Disabling this would stop HIFUAcridTweaks from syncing config whenever a new version is found.");
+            bool _preVersioning = !((Dictionary<ConfigDefinition, string>)AccessTools.DeclaredPropertyGetter(typeof(ConfigFile), "OrphanedEntries").Invoke(HACTConfig, null)).Keys.Any(x => x.Key == "Latest Version");
+            latestVersion = HACTConfig.Bind("Config", "Latest Version", PluginVersion, "DO NOT CHANGE THIS");
+            if (enableAutoConfig.Value && (_preVersioning || (latestVersion.Value != PluginVersion)))
+            {
+                latestVersion.Value = PluginVersion;
+                ConfigManager.VersionChanged = true;
+                HACTLogger.LogInfo("Config Autosync Enabled.");
+            }
 
             var acrid = Addressables.LoadAssetAsync<GameObject>("RoR2/Base/Croco/CrocoBody.prefab").WaitForCompletion();
             var esm = acrid.AddComponent<EntityStateMachine>();
