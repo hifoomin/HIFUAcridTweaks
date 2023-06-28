@@ -38,7 +38,6 @@ namespace HIFUAcridTweaks
                     backupVal.BoxedValue = backupVal.DefaultValue; // update old default to new default
                 }
             }
-            if (!ConfigEqual(entry.DefaultValue, entry.BoxedValue)) ConfigChanged = true;
         }
 
         private static bool ConfigEqual(object a, object b)
