@@ -43,10 +43,10 @@ namespace HIFUAcridTweaks.Skills
 
             damage = ConfigOption(2.5f, "Damage", "Decimal. Vanilla is 1");
             cooldown = ConfigOption(10f, "Cooldown", "Vanilla is 10");
-            maxTargets = ConfigOption(4, "Max Targets", "Vanilla is 41");
+            maxTargets = ConfigOption(4, "Max Targets", "Vanilla is 1048577");
             maxDistance = ConfigOption(45f, "Max Range", "Vanilla is 30");
             shareDuration = ConfigOption(5f, "Damage Sharing Duration", "");
-            sharedPercent = ConfigOption(0.25f, "Damage Sharing Percent", "Decimal.");
+            sharedPercent = ConfigOption(0.33f, "Damage Sharing Percent", "Decimal.");
             base.Init();
         }
 
