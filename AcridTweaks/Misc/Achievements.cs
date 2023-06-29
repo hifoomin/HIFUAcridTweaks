@@ -1,4 +1,8 @@
-﻿using R2API;
+﻿using Mono.Cecil.Cil;
+using MonoMod.Cil;
+using R2API;
+using RoR2.Achievements;
+using System;
 
 namespace HIFUAcridTweaks.Misc
 {
@@ -16,19 +20,57 @@ namespace HIFUAcridTweaks.Misc
 
         public override void Hooks()
         {
-            On.RoR2.Achievements.BaseStatMilestoneAchievement.OnInstall += BaseStatMilestoneAchievement_OnInstall;
+            IL.RoR2.Achievements.BaseStatMilestoneAchievement.ProgressForAchievement += BaseStatMilestoneAchievement_ProgressForAchievement;
+            IL.RoR2.Achievements.BaseStatMilestoneAchievement.Check += BaseStatMilestoneAchievement_Check;
             Changes();
         }
 
-        private void BaseStatMilestoneAchievement_OnInstall(On.RoR2.Achievements.BaseStatMilestoneAchievement.orig_OnInstall orig, RoR2.Achievements.BaseStatMilestoneAchievement self)
+        private void BaseStatMilestoneAchievement_Check(ILContext il)
         {
-            if (self is RoR2.Achievements.Croco.CrocoTotalInfectionsMilestoneAchievement)
+            ILCursor c = new(il);
+
+            if (c.TryGotoNext(MoveType.Before,
+                x => x.MatchCallOrCallvirt<BaseStatMilestoneAchievement>("get_statRequirement")))
             {
-                Main.HACTLogger.LogError("stat req pre is " + self.statRequirement);
-                R2API.Utils.Reflection.SetFieldValue(self.statRequirement, "get_statRequirement", poisonCount);
-                Main.HACTLogger.LogError("stat req POST is " + self.statRequirement);
+                c.Index++;
+                c.Emit(OpCodes.Ldarg_0);
+                c.EmitDelegate<Func<ulong, BaseStatMilestoneAchievement, ulong>>((orig, self) =>
+                {
+                    if (self is RoR2.Achievements.Croco.CrocoTotalInfectionsMilestoneAchievement)
+                    {
+                        return poisonCount;
+                    }
+                    return orig;
+                });
             }
-            orig(self);
+            else
+            {
+                Main.HACTLogger.LogError("Failed to apply Poison Count 2 hook");
+            }
+        }
+
+        private void BaseStatMilestoneAchievement_ProgressForAchievement(ILContext il)
+        {
+            ILCursor c = new(il);
+
+            if (c.TryGotoNext(MoveType.Before,
+                x => x.MatchCallOrCallvirt<BaseStatMilestoneAchievement>("get_statRequirement")))
+            {
+                c.Index++;
+                c.Emit(OpCodes.Ldarg_0);
+                c.EmitDelegate<Func<ulong, BaseStatMilestoneAchievement, ulong>>((orig, self) =>
+                {
+                    if (self is RoR2.Achievements.Croco.CrocoTotalInfectionsMilestoneAchievement)
+                    {
+                        return poisonCount;
+                    }
+                    return orig;
+                });
+            }
+            else
+            {
+                Main.HACTLogger.LogError("Failed to apply Poison Count 1 hook");
+            }
         }
 
         private void Changes()
