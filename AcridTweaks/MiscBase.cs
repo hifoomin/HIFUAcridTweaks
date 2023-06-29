@@ -8,8 +8,8 @@
 
         public T ConfigOption<T>(T value, string name, string description)
         {
-            var config = Main.HACTConfig.Bind<T>(Name, name, value, description); // make the config
-            ConfigManager.HandleConfig(config, Main.HACTConfig, Name); // config versioning
+            var config = Main.HACTConfig.Bind<T>(Name, name, value, description);
+            ConfigManager.HandleConfig<T>(config, Main.HACTBackupConfig, name);
             return config.Value;
         }
 
