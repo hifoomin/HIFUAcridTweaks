@@ -7,10 +7,10 @@ namespace HIFUAcridTweaks.Skills
 {
     internal class ViciousWounds : TweakBase
     {
-        public bool disableCancel;
-        public float duration;
-        public float damage;
-        public float lastHitDamage;
+        public static bool disableCancel;
+        public static float duration;
+        public static float damage;
+        public static float lastHitDamage;
         public override bool DoesNotKillTheMod => true;
         public override string Name => "Primary : Vicious Wounds";
 

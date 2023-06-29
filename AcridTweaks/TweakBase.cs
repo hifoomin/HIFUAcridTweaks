@@ -1,8 +1,4 @@
-﻿using BepInEx.Configuration;
-using R2API;
-using static Mono.Security.X509.X520;
-using static System.Collections.Specialized.BitVector32;
-using System.Text.RegularExpressions;
+﻿using R2API;
 
 namespace HIFUAcridTweaks
 {

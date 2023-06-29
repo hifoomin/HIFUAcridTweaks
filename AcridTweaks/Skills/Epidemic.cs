@@ -63,7 +63,7 @@ namespace HIFUAcridTweaks.Skills
             orig(self, info);
             if (NetworkServer.active && info.attacker && info.attacker.GetComponent<TeamComponent>())
             {
-                if (DamageAPI.HasModdedDamageType(info, shared))
+                if (DamageAPI.HasModdedDamageType(info, shared) && info.procCoefficient > 0)
                 {
                     self.body.AddTimedBuffAuthority(shareDamage.buffIndex, shareDuration);
                 }
