@@ -14,7 +14,7 @@ namespace HIFUAcridTweaks.Misc
         public override void Init()
         {
             baseDamage = ConfigOption(12f, "Base Damage", "Vanilla is 15");
-            baseHealth = ConfigOption(140f, "Base Health", "Vanilla is 160");
+            baseHealth = ConfigOption(120f, "Base Health", "Vanilla is 160");
             base.Init();
         }
 

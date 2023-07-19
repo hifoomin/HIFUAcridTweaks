@@ -39,16 +39,22 @@ namespace HIFUAcridTweaks
         public static DamageAPI.ModdedDamageType poison = DamageAPI.ReserveDamageType();
         public static DamageAPI.ModdedDamageType blight = DamageAPI.ReserveDamageType();
 
+        public static bool _preVersioning = false;
+
+        public static AssetBundle iHateThis;
+
         public void Awake()
         {
             HACTLogger = Logger;
             HACTConfig = Config;
 
+            iHateThis = AssetBundle.LoadFromFile(Assembly.GetExecutingAssembly().Location.Replace("HIFUAcridTweaks.dll", "hifuacridtweaks"));
+
             HACTBackupConfig = new(Paths.ConfigPath + "\\" + PluginAuthor + "." + PluginName + ".Backup.cfg", true);
             HACTBackupConfig.Bind(": DO NOT MODIFY THIS FILES CONTENTS :", ": DO NOT MODIFY THIS FILES CONTENTS :", ": DO NOT MODIFY THIS FILES CONTENTS :", ": DO NOT MODIFY THIS FILES CONTENTS :");
 
             enableAutoConfig = HACTConfig.Bind("Config", "Enable Auto Config Sync", true, "Disabling this would stop HIFUAcridTweaks from syncing config whenever a new version is found.");
-            bool _preVersioning = !((Dictionary<ConfigDefinition, string>)AccessTools.DeclaredPropertyGetter(typeof(ConfigFile), "OrphanedEntries").Invoke(HACTConfig, null)).Keys.Any(x => x.Key == "Latest Version");
+            _preVersioning = !((Dictionary<ConfigDefinition, string>)AccessTools.DeclaredPropertyGetter(typeof(ConfigFile), "OrphanedEntries").Invoke(HACTConfig, null)).Keys.Any(x => x.Key == "Latest Version");
             latestVersion = HACTConfig.Bind("Config", "Latest Version", PluginVersion, "DO NOT CHANGE THIS");
             if (enableAutoConfig.Value && (_preVersioning || (latestVersion.Value != PluginVersion)))
             {

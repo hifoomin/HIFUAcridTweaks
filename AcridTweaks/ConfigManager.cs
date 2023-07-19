@@ -19,6 +19,8 @@ namespace HIFUAcridTweaks
 
             var backupVal = (ConfigEntryBase)method.Invoke(config, newConfigEntry);
 
+            if (Main._preVersioning) entry.BoxedValue = entry.DefaultValue;
+
             if (!ConfigEqual(backupVal.DefaultValue, backupVal.BoxedValue))
             {
                 if (VersionChanged)

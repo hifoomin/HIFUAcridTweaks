@@ -41,12 +41,12 @@ namespace HIFUAcridTweaks.Skills
 
             ContentAddition.AddBuffDef(shareDamage);
 
-            damage = ConfigOption(2.5f, "Damage", "Decimal. Vanilla is 1");
+            damage = ConfigOption(2.4f, "Damage", "Decimal. Vanilla is 1");
             cooldown = ConfigOption(10f, "Cooldown", "Vanilla is 10");
             maxTargets = ConfigOption(4, "Max Targets", "Vanilla is 1048577");
-            maxDistance = ConfigOption(45f, "Max Range", "Vanilla is 30");
+            maxDistance = ConfigOption(35f, "Max Range", "Vanilla is 30");
             shareDuration = ConfigOption(5f, "Damage Sharing Duration", "");
-            sharedPercent = ConfigOption(0.33f, "Damage Sharing Percent", "Decimal.");
+            sharedPercent = ConfigOption(0.3f, "Damage Sharing Percent", "Decimal.");
             base.Init();
         }
 
@@ -58,61 +58,65 @@ namespace HIFUAcridTweaks.Skills
             Changes();
         }
 
+        // I HATE THIS
         private void HealthComponent_TakeDamage(On.RoR2.HealthComponent.orig_TakeDamage orig, HealthComponent self, DamageInfo info)
         {
             orig(self, info);
             if (NetworkServer.active && info.attacker && info.attacker.GetComponent<TeamComponent>())
             {
-                if (DamageAPI.HasModdedDamageType(info, shared) && info.procCoefficient > 0)
+                if ((!DamageAPI.HasModdedDamageType(info, Main.poison) || !DamageAPI.HasModdedDamageType(info, Main.blight)) && info.procCoefficient > 0f)
                 {
-                    self.body.AddTimedBuffAuthority(shareDamage.buffIndex, shareDuration);
-                }
-
-                if (self.body.HasBuff(shareDamage) && !info.procChainMask.HasProc(sharedMask))
-                {
-                    SphereSearch search = new()
+                    if (DamageAPI.HasModdedDamageType(info, shared))
                     {
-                        origin = info.position,
-                        radius = 2000f,
-                        mask = LayerIndex.entityPrecise.mask,
-                        queryTriggerInteraction = QueryTriggerInteraction.Ignore
-                    };
+                        self.body.AddTimedBuffAuthority(shareDamage.buffIndex, shareDuration);
+                    }
 
-                    var teamIndex = info.attacker.GetComponent<TeamComponent>().teamIndex;
-
-                    search.RefreshCandidates();
-                    search.FilterCandidatesByDistinctHurtBoxEntities();
-                    HurtBox[] boxes = search.GetHurtBoxes();
-                    foreach (HurtBox box in boxes)
+                    if (self.body.HasBuff(shareDamage) && !info.procChainMask.HasProc(sharedMask))
                     {
-                        if (box.teamIndex != teamIndex && box.healthComponent && box.healthComponent != self && box.healthComponent.body.HasBuff(shareDamage))
+                        SphereSearch search = new()
                         {
-                            LightningOrb orb = new()
+                            origin = info.position,
+                            radius = maxDistance * 3f,
+                            mask = LayerIndex.entityPrecise.mask,
+                            queryTriggerInteraction = QueryTriggerInteraction.Ignore
+                        };
+
+                        var teamIndex = info.attacker.GetComponent<TeamComponent>().teamIndex;
+
+                        search.RefreshCandidates();
+                        search.FilterCandidatesByDistinctHurtBoxEntities();
+                        HurtBox[] boxes = search.GetHurtBoxes();
+                        foreach (HurtBox box in boxes)
+                        {
+                            if (box.teamIndex != teamIndex && box.healthComponent && box.healthComponent != self && box.healthComponent.body.HasBuff(shareDamage))
                             {
-                                lightningType = LightningOrb.LightningType.BFG,
-                                canBounceOnSameTarget = false,
-                                bouncesRemaining = 1,
-                                damageColorIndex = DamageColorIndex.Poison,
-                                damageValue = info.damage * sharedPercent,
-                                damageCoefficientPerBounce = 1f,
-                                attacker = info.attacker,
-                                isCrit = info.crit,
-                                target = box,
-                                teamIndex = teamIndex,
-                                targetsToFindPerBounce = 1,
-                                speed = 20000f,
-                                origin = info.position,
-                                procCoefficient = 0f,
-                                bouncedObjects = new System.Collections.Generic.List<HealthComponent>(),
-                                duration = 0.2f
-                            };
+                                LightningOrb orb = new()
+                                {
+                                    lightningType = LightningOrb.LightningType.BFG,
+                                    canBounceOnSameTarget = false,
+                                    bouncesRemaining = 1,
+                                    damageColorIndex = DamageColorIndex.SuperBleed,
+                                    damageValue = info.damage * sharedPercent,
+                                    damageCoefficientPerBounce = 1f,
+                                    attacker = info.attacker,
+                                    isCrit = info.crit,
+                                    target = box,
+                                    teamIndex = teamIndex,
+                                    targetsToFindPerBounce = 1,
+                                    speed = 20f,
+                                    origin = info.position,
+                                    procCoefficient = 0f,
+                                    bouncedObjects = new System.Collections.Generic.List<HealthComponent>(),
+                                    duration = maxDistance * 3f
+                                };
 
-                            ProcChainMask mask = new();
-                            mask.AddProc(sharedMask);
+                                ProcChainMask mask = new();
+                                mask.AddProc(sharedMask);
 
-                            orb.procChainMask = mask;
+                                orb.procChainMask = mask;
 
-                            OrbManager.instance.AddOrb(orb);
+                                OrbManager.instance.AddOrb(orb);
+                            }
                         }
                     }
                 }

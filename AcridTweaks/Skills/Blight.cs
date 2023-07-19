@@ -38,7 +38,7 @@ namespace HIFUAcridTweaks.Skills
             ContentAddition.AddBuffDef(blight);
 
             duration = ConfigOption(3f, "Duration", "Vanilla is 5");
-            damagePerSecond = ConfigOption(1.3f, "Base Damage Per Second", "Decimal. Vanilla is 0.6");
+            damagePerSecond = ConfigOption(1.1f, "Base Damage Per Second", "Decimal. Vanilla is 0.6");
 
             blightDef = new()
             {

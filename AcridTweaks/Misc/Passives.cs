@@ -59,6 +59,8 @@ namespace HIFUAcridTweaks.Misc
 
             ContentAddition.AddSkillDef(regenerativeSD);
 
+            var blightTex = Addressables.LoadAssetAsync<SkillDef>("RoR2/Base/Croco/CrocoPassiveBlight.asset").WaitForCompletion().icon;
+
             frenziedSD = ScriptableObject.CreateInstance<SkillDef>();
             (frenziedSD as ScriptableObject).name = "Frenzied Passive";
             frenziedSD.skillName = "Frenzied";
@@ -82,16 +84,14 @@ namespace HIFUAcridTweaks.Misc
             frenziedSD.canceledFromSprinting = false;
             frenziedSD.isCombatSkill = true;
             frenziedSD.mustKeyPress = false;
-            frenziedSD.icon = Addressables.LoadAssetAsync<SkillDef>("RoR2/Base/Croco/CrocoPassiveBlight.asset").WaitForCompletion().icon;
+            frenziedSD.icon = blightTex;
 
             ContentAddition.AddSkillDef(frenziedSD);
-
-            var blightTex = Addressables.LoadAssetAsync<Texture2D>("RoR2/Base/Croco/texCrocoSkillIcons.png").WaitForCompletion();
 
             frenziedUnlock = ScriptableObject.CreateInstance<UnlockableDef>();
             frenziedUnlock.nameToken = "ACHIEVEMENT_ACRIDFRENZIED_NAME";
             frenziedUnlock.cachedName = "Acrid.Skills_Frenzied";
-            frenziedUnlock.achievementIcon = Sprite.Create(blightTex, new Rect(0f, 0f, 128f, 128f), new Vector2(0f, 0f));
+            frenziedUnlock.achievementIcon = Main.iHateThis.LoadAsset<Sprite>("Assets/HIFUAcridTweaks/bloighjt.png");
 
             LanguageAPI.Add("ACHIEVEMENT_ACRIDFRENZIED_NAME", "Acrid: Frenzy");
             LanguageAPI.Add("ACHIEVEMENT_ACRIDFRENZIED_DESCRIPTION", "As Acrid, use 10 skills in under 3 seconds.");
