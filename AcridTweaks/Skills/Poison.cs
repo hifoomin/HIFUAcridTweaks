@@ -33,7 +33,7 @@ namespace HIFUAcridTweaks.Skills
             poison.canStack = false;
             poison.isHidden = false;
             poison.iconSprite = Addressables.LoadAssetAsync<BuffDef>("RoR2/Base/Croco/bdPoisoned.asset").WaitForCompletion().iconSprite;
-            poison.buffColor = new Color32(201, 242, 77, 255);
+            poison.buffColor = new Color32(201, 242, 255, 255); // 77
             poison.name = "Poison";
 
             ContentAddition.AddBuffDef(poison);
@@ -62,7 +62,7 @@ namespace HIFUAcridTweaks.Skills
 
         public override void Hooks()
         {
-            IL.RoR2.GlobalEventManager.OnHitEnemy += GlobalEventManager_OnHitEnemy;
+            // IL.RoR2.GlobalEventManager.OnHitEnemy += GlobalEventManager_OnHitEnemy;
             GlobalEventManager.onServerDamageDealt += GlobalEventManager_onServerDamageDealt;
         }
 

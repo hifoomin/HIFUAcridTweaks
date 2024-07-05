@@ -46,7 +46,7 @@ namespace HIFUAcridTweaks.Skills
             maxTargets = ConfigOption(4, "Max Targets", "Vanilla is 1048577");
             maxDistance = ConfigOption(35f, "Max Range", "Vanilla is 30");
             shareDuration = ConfigOption(5f, "Damage Sharing Duration", "");
-            sharedPercent = ConfigOption(0.3f, "Damage Sharing Percent", "Decimal.");
+            sharedPercent = ConfigOption(0.25f, "Damage Sharing Percent", "Decimal.");
             base.Init();
         }
 

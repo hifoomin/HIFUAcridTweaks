@@ -32,7 +32,7 @@ namespace HIFUAcridTweaks.Skills
             blight.canStack = true;
             blight.isHidden = false;
             blight.iconSprite = Addressables.LoadAssetAsync<BuffDef>("RoR2/Base/Croco/bdBlight.asset").WaitForCompletion().iconSprite;
-            blight.buffColor = new Color32(177, 56, 127, 255);
+            blight.buffColor = new Color32(0, 56, 127, 255); // 177
             blight.name = "Blight";
 
             ContentAddition.AddBuffDef(blight);
@@ -50,7 +50,7 @@ namespace HIFUAcridTweaks.Skills
             CustomDotBehaviour behavior = delegate (DotController self, DotStack dotStack)
             {
                 var attackerBody = dotStack.attackerObject?.GetComponent<CharacterBody>();
-                dotStack.damage = attackerBody.damage * damagePerSecond * 0.2f; // 26% per tick, for 130% dps
+                dotStack.damage = attackerBody.damage * damagePerSecond * 0.2f; // 22% per tick, for 110% dps
             };
             blightIndex = RegisterDotDef(blightDef, behavior);
 
@@ -59,7 +59,7 @@ namespace HIFUAcridTweaks.Skills
 
         public override void Hooks()
         {
-            IL.RoR2.GlobalEventManager.OnHitEnemy += GlobalEventManager_OnHitEnemy;
+            // IL.RoR2.GlobalEventManager.OnHitEnemy += GlobalEventManager_OnHitEnemy;
             GlobalEventManager.onServerDamageDealt += GlobalEventManager_onServerDamageDealt;
         }
 
